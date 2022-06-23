@@ -1,0 +1,13 @@
+python-3.9.12
+dash
+jupyter-dash
+dash-labs
+dash-bootstrap-components
+wordcloud==1.8.1
+numpy==1.9.0
+scipy==0.14.0
+patsy==0.3.0
+pandas==0.13.0
+statsmodels
+wordcloud==1.8.1
+statsmodels==0.13.2
