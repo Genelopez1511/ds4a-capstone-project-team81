@@ -4,7 +4,7 @@
 Proyecto del grupo 81.
 
 
-Para ejecutar dash, tienes que ejecutar el crip de python llamado app.py lo ejecutas en el debuger.
+Para ejecutar dash, tienes que ejecutar el script de python llamado app.py lo ejecutas en el debuger.
 al ejecutarlo te saldra un aviso como este :
 
 * Serving Flask app "app" (lazy loading)
