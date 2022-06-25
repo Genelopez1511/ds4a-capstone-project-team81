@@ -14,8 +14,8 @@ from sklearn import datasets
 from sklearn.cluster import KMeans
 
 # Leer el dataset
-hurtos_df = pd.read_csv('/mnt/c/Users/Génesis/Desktop/proyecto_DS4A/project_ds4a/data/hurto_a_persona.csv', encoding='utf-8')
-consolidado_df = pd.read_csv('/mnt/c/Users/Génesis/Desktop/proyecto_DS4A/project_ds4a/data/consolidado_cantidad_casos_criminalidad_por_anio_mes.csv', encoding='utf-8')
+hurtos_df = pd.read_csv('/mnt/c/Users/Génesis/Documents/GitHub/ds4a-capstone-project-team81/data/hurto_a_persona.csv', encoding='utf-8')
+consolidado_df = pd.read_csv('/mnt/c/Users/Génesis/Documents/GitHub/ds4a-capstone-project-team81/data/consolidado_cantidad_casos_criminalidad_por_anio_mes.csv', encoding='utf-8')
 print(hurtos_df.head())
 
 
