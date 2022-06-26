@@ -1,13 +1,15 @@
-python-3.9.12
-dash
-jupyter-dash
-dash-labs
-dash-bootstrap-components
+#python-3.9.12
+dash==2.5.1
+dash-bootstrap-components==1.1.0
+dash-html-components ==2.0.0
 wordcloud==1.8.1
-numpy==1.9.0
-scipy==0.14.0
-patsy==0.3.0
-pandas==0.13.0
-statsmodels
+numpy==1.22.2
+pandas==1.2.5
+statsmodels==0.13.2
 wordcloud==1.8.1
 statsmodels==0.13.2
+nbconvert==6.5.0
+nbformat==5.3.0
+geopandas==0.9.0
+plotly==5.7.0
+matplotlib==3.5.1
