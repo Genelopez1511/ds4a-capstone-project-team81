@@ -7,6 +7,8 @@ import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 from dash import Input, Output, State, html
 
+from components.histogram import histogram
+
 from datetime import datetime as dt
 import numpy as np
 import pandas as pd
@@ -92,7 +94,7 @@ controls = dbc.Card(
                 dcc.Dropdown(
                     id="x-variable",
                     options=[
-                        {"label": col, "value": col} for col in iris.columns
+                        {"label": col, "value": col} for col in ['el poblado', 'estadio', 'calasanz']
                     ],
                     value="sepal length (cm)",
                 ),
@@ -104,7 +106,7 @@ controls = dbc.Card(
                 dcc.Dropdown(
                     id="y-variable",
                     options=[
-                        {"label": col, "value": col} for col in iris.columns
+                        {"label": col, "value": col} for col in ['el poblado', 'estadio', 'calasanz']
                     ],
                     value="sepal width (cm)",
                 ),
@@ -162,7 +164,10 @@ def render_tab_content(active_tab, data):
     """
     if active_tab and data is not None:
         if active_tab == "scatter":
-            return dcc.Graph(figure=data["scatter"])
+            # return dcc.Graph(figure=data["scatter"])
+            h = histogram.Histogram('')
+            h = histogram.Histogram('')
+            return h
         elif active_tab == "histogram":
             return dbc.Row(
                 [
