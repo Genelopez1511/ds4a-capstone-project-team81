@@ -8,6 +8,7 @@ import dash_bootstrap_components as dbc
 from dash import Input, Output, State, html
 
 from components.histogram import histogram
+from components.model import model
 
 PLOTLY_LOGO = "https://images.plot.ly/logo/new-branding/plotly-logomark.png"
 
@@ -47,7 +48,8 @@ logo = dbc.Navbar(
                 dbc.Row(
                     [
                         dbc.Col(html.Img(src=PLOTLY_LOGO, height="30px")),
-                        dbc.Col(dbc.NavbarBrand("Analysis of crime data in Medellin, Colombia.", className="ms-2")),
+                        dbc.Col(dbc.NavbarBrand(
+                            "Analysis of crime data in Medellin, Colombia.", className="ms-2")),
                     ],
                     align="center",
                     className="g-0",
@@ -138,13 +140,33 @@ select = dbc.Select(
 
 form = dbc.Form([select])
 
+form2 = dbc.Form([
+    dbc.Label("Comune Number", html_for="comuna_number"),
+    dbc.Input(type="text", id="comuna_number",
+              placeholder="Commune number", value="14"),
+    dbc.Label("Sex Femaie", html_for="comuna_number"),
+    dbc.Input(type="text", id="sex_female",
+              placeholder="Sex Femaie", value="1"),
+    dbc.Label("Sex Male", html_for="comuna_number"),
+    dbc.Input(type="text", id="sex_male", placeholder="Sex Male", value="0"),
+    dbc.Label("Age", html_for="comuna_number"),
+    dbc.Input(type="text", id="age", placeholder="Age", value="33"),
+    dbc.Label("Hour", html_for="comuna_number"),
+    dbc.Input(type="text", id="hour", placeholder="Hour", value="1"),
+    dbc.Label("Weekday", html_for="comuna_number"),
+    dbc.Input(type="text", id="weekday", placeholder="Weekday", value="6"),
+])
+
 row_content = [
     dbc.Col(html.Div(
         [
-            dbc.Label("Selecciona un barrio"),
-            form
+            dbc.Label("Select a Neighborhood (Statistics tab)"),
+            form,
+
+            dbc.Label("Model Input Data"),
+            form2
         ]
-        ), width=3),
+    ), width=3),
     dbc.Col(html.Div(id="tab-content", className="p-4"), width=9),
 ]
 
@@ -186,8 +208,14 @@ app.layout = dbc.Container(
     Output("tab-content", "children"),
     [Input("tabs", "active_tab"),
      Input('neighborhood', 'value')],
+    Input('comuna_number', 'value'),
+    Input('sex_female', 'value'),
+    Input('sex_male', 'value'),
+    Input('age', 'value'),
+    Input('hour', 'value'),
+    Input('weekday', 'value'),
 )
-def render_tab_content(active_tab, neighborhood):
+def render_tab_content(active_tab, neighborhood, comuna_number, sex_female, sex_male, age, hour, weekday):
     """
     This callback takes the 'active_tab' property as input, as well as the
     stored graphs, and renders the tab content depending on what the value of
@@ -199,11 +227,9 @@ def render_tab_content(active_tab, neighborhood):
 
             return graphs
         elif active_tab == "histogram":
-            return dbc.Row(
-                [
-                    dbc.Col('Modelo')
-                ]
-            )
+            models = model.Model(comuna_number, sex_female, sex_male, age, hour, weekday)
+
+            return models
     return "No tab selected"
 
 
