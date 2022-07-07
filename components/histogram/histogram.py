@@ -12,7 +12,7 @@ class Histogram(html.Div):
         neighborhood
     ):
         # This comes from the EDA process
-        hurtos_df = pd.read_csv('/Users/juliand/Projects/DS4A/ds4a-capstone-project-team81/data/hurto_a_persona.csv')
+        hurtos_df = pd.read_csv('data/hurto_a_persona.csv')
         hurtos_df['fecha_hecho'] = pd.to_datetime(hurtos_df['fecha_hecho'])
         hurtos_df['edad_categoria']= hurtos_df['edad_categoria'].astype('category')
         hurtos_df['modalidad'].unique()
@@ -50,7 +50,8 @@ class Histogram(html.Div):
         hurtos_df['month'] = hurtos_df['month'].replace('Sin dato',np.nan) 
         hurtos_df['sexo'] = hurtos_df['sexo'].replace('Sin dato',np.nan)
 
-        consolidado_df = pd.read_csv('/Users/juliand/Projects/DS4A/ds4a-capstone-project-team81/data/consolidado_cantidad_casos_criminalidad_por_anio_mes.csv',encoding = 'utf-8')
+        consolidado_df = pd.read_csv(
+            'data/consolidado_cantidad_casos_criminalidad_por_anio_mes.csv', encoding='utf-8')
         consolidado_df['Fecha_hecho'] = pd.to_datetime(consolidado_df['Fecha_hecho'])
 
         #extract year date_fact from consolidado_df
@@ -76,6 +77,19 @@ class Histogram(html.Div):
         # sample 1000
         non_nan_hurtos_año = non_nan_hurtos_año.sample(1000)
 
+        # Aplicamos el filtro de barrio sobre el df ya construído
+        if neighborhood is not None:
+            non_nan_hurtos_año = non_nan_hurtos_año[non_nan_hurtos_año['nombre_barrio'] == neighborhood]
+
+        # scatter mapbox
+        fig1 = px.scatter_mapbox(non_nan_hurtos_año, lat="latitud", lon="longitud", color="modalidad", size="Cantidad_casos",
+                                 size_max=25, zoom=10, center={"lat": 6.29970294, "lon": -75.58201578},
+                                 opacity=0.5)
+        fig1.update_layout(mapbox_style="open-street-map")
+        fig1.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+        # dcc.Graph(figure=fig1)
+        # fig1.show()
+
         # histograma fig1
         fig2 = px.histogram(non_nan_hurtos_año, x="Cantidad_casos", y='nombre_barrio', color='modalidad',
                                     histfunc='count', nbins=10, marginal='box',
@@ -89,7 +103,13 @@ class Histogram(html.Div):
         super().__init__([
             dbc.Row(
                 [
-                    dbc.Col(dcc.Graph(figure=fig2)),
+                    dbc.Col(dcc.Graph(figure=fig1)),
                 ]
-            )
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(dcc.Graph(figure=fig2)),
+                ],
+                style={'margin-top': '20px'}
+            ),
         ])

@@ -3,25 +3,11 @@ from cProfile import label
 import time # Únicamente se utiliza para la generación aleatoria de datos en la gráfica de ejemplo
 
 import dash
-import dash_core_components as dcc
+# import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 from dash import Input, Output, State, html
 
 from components.histogram import histogram
-
-from datetime import datetime as dt
-import numpy as np
-import pandas as pd
-import plotly.graph_objects as go
-import plotly.express as px
-
-
-# Leer el dataset
-hurtos_df = pd.read_csv('/Users/juliand/Projects/DS4A/ds4a-capstone-project-team81/data/hurto_a_persona.csv', encoding='utf-8')
-consolidado_df = pd.read_csv('/Users/juliand/Projects/DS4A/ds4a-capstone-project-team81/data/consolidado_cantidad_casos_criminalidad_por_anio_mes.csv', encoding='utf-8')
-# hurtos_df = pd.read_csv('/mnt/c/Users/Génesis/Desktop/proyecto_DS4A/project_ds4a/data/hurto_a_persona.csv', encoding='utf-8')
-# consolidado_df = pd.read_csv('/mnt/c/Users/Génesis/Desktop/proyecto_DS4A/project_ds4a/data/consolidado_cantidad_casos_criminalidad_por_anio_mes.csv', encoding='utf-8')
-print(hurtos_df.head())
 
 PLOTLY_LOGO = "https://images.plot.ly/logo/new-branding/plotly-logomark.png"
 
@@ -86,57 +72,94 @@ logo = dbc.Navbar(
     className="mb-5",
 )
 
-controls = dbc.Card(
-    [
-        html.Div(
-            [
-                dbc.Label("X variable"),
-                dcc.Dropdown(
-                    id="x-variable",
-                    options=[
-                        {"label": col, "value": col} for col in ['el poblado', 'estadio', 'calasanz']
-                    ],
-                    value="sepal length (cm)",
-                ),
-            ]
-        ),
-        html.Div(
-            [
-                dbc.Label("Y variable"),
-                dcc.Dropdown(
-                    id="y-variable",
-                    options=[
-                        {"label": col, "value": col} for col in ['el poblado', 'estadio', 'calasanz']
-                    ],
-                    value="sepal width (cm)",
-                ),
-            ]
-        ),
-        html.Div(
-            [
-                dbc.Label("Cluster count"),
-                dbc.Input(id="cluster-count", type="number", value=3),  
-            ]
-        ),
-    ],
-    body=True,
+# Contruímos el layout utilizando componentes para una mejor organización del código.
+
+neighborhoods = ['Buenos Aires', 'Patio Bonito', 'San Isidro', 'Granizal', 'La Candelaria',
+                 'Jardín Botánico', 'Las Palmas S.E.', 'Las Playas', 'Los Balsos No.1',
+                 'Doce de Octubre No.2', 'Manrique Central No.2', 'El Tesoro',
+                 'Cuarta Brigada', 'El Picacho', 'Ecoparque Cerro El Volador', 'Guayaquil',
+                 'El Nogal-Los Almendros', 'El Salvador', 'Belén', 'Caribe', 'Las Lomas No.1',
+                 'Altamira', 'Hospital San Vicente de Paúl', 'Santa Lucía',
+                 'Centro Administrativo', 'La Alpujarra', 'Cerro Nutibara Ins.',
+                 'Santo Domingo Savio No.1', 'El Poblado', 'Sucre', 'Los Colores',
+                 'Santa María de los Ángeles', 'Santa Inés', 'Las Esmeraldas', 'Estadio',
+                 'Berlin', 'Bomboná No.2', 'San Bernardo', 'La Frontera', 'Boqueron',
+                 'Alfonso López', 'Lorena', 'Los Pinos', 'Simón Bolívar', 'La Milagrosa',
+                 'Parque Juan Pablo II', 'Los Conquistadores', 'Villa Nueva', 'Prado',
+                 'Alejandro Echavarría', 'Suramericana', 'Los Alcázares', 'Aures No.1',
+                 'Moravia', 'López de Mesa', 'Fátima', 'Astorga', 'San Diego',
+                 'Perpetuo Socorro', 'Barrio Colón', 'La Florida', 'Campo Valdés No.1',
+                 'Naranjal', 'Calasanz', 'Castilla', 'Córdoba', 'Estación Villa', 'Calle Nueva',
+                 'Manila', 'Terminal de Transporte', 'B. Cerro el Volador', 'Bolivariana',
+                 'Guayabal', 'Nuevos Conquistadores', 'La Hondonada', 'El Raizal',
+                 'Moscú No.1', 'Las Acacias', 'Enciso', 'Sevilla', 'Jesús Nazareno',
+                 'Miraflores', 'Los Ángeles', 'El Velódromo', 'Florida Nueva', 'Las Granjas',
+                 'Francisco Antonio Zea', 'La Mota', 'La Palma', 'Villa Carlota', 'La Gloria',
+                 'Sin dato 60 San Cristobal', 'El Diamante No.2', 'Nueva Villa del Aburrá',
+                 'Laureles', 'Los Mangos', 'Las Palmas', 'U.D. Atanasio Girardot',
+                 'La Loma de los Bernal', 'Rosales', 'El Chagualo', 'San Benito',
+                 'San Martín de Porres', 'Barrio Colombia', 'Asomadera No.1',
+                 'La Esperanza No.2', 'La Piñuela', 'Parque Norte', 'Media Luna',
+                 'La Floresta', 'Progreso', 'Campo Amor', 'Cristo Rey', 'El Diamante',
+                 'Picacho', 'Oleoducto', 'Cataluña', 'Manrique Central No.1', 'San Miguel',
+                 'Brasilia', 'La Castellana', 'Barrio Caycedo', 'San Javier No.1', 'Cucaracho',
+                 'Andalucía', 'Santa Cruz', 'La Ladera', 'Castropol', 'La Avanzada', 'Santa Fé',
+                 'Los Naranjos', 'Facultad de Minas U. Nal', 'Las Violetas', 'El Rincón',
+                 'El Castillo', 'Los Alpes', 'Trinidad', 'Área Urbana Cgto. San Cristóbal',
+                 'Playón de los Comuneros', 'El Pinal', 'Boyacá', 'Las Mercedes', 'San Lucas',
+                 'Carlos E. Restrepo', 'Diego Echavarría', 'La Esperanza', 'Pedregal',
+                 'Palenque', 'La Pilarica', 'Área de expansión San Antonio De Prado',
+                 'Tricentenario', 'Calasania Parte Alta', 'Campo Alegre', 'La Colina',
+                 'Bomboná No.1', 'Nueva Villa de la Iguaná', 'Santa Teresita', 'Palermo',
+                 'Juan XXIIIi la Quiebra', 'El Danubio', 'La Mansión', 'Toscana', 'Boston',
+                 'Aranjuez', 'La Aguacatala', 'El Pesebre', 'U.P.B', 'Robledo', 'Villa Flora',
+                 'Tejelo', 'Las Independencias', 'Área de expansión Pajarito', 'Ferrini',
+                 'La América', 'Las Estancias', 'Área Urbana Cgto. San Antonio de Prado',
+                 'Facultad de Minas U. Nacional', 'San Germán', 'Aures No.2',
+                 'Héctor Abad Gómez', 'Altavista', 'Las Lomas No.2', 'Granada',
+                 'Villa del Socorro', 'San Joaquín', 'Santa Elena sector central',
+                 'San Jose de La Montaña', 'Santander', 'Pajarito', 'Belalcázar', 'Belencito',
+                 'El Pomar', 'Antonio Nariño', 'La Salle', 'Monteclaro', 'Volcana Guayabal',
+                 'Barrio Cristóbal', 'Los Cerros el Vergel', 'Altavista Sector Central',
+                 'Veinte de Julio', 'Manrique Oriental', 'Girardot',
+                 'Batallón Cuarta Brigada', 'Kennedy', 'Villa Guadalupe', 'Florencia',
+                 'Bosques de San Pablo', 'La Loma', 'Universidad de Antioquia',
+                 'Altos del Poblado', 'El Rodeo', 'Los Balsos No.2', 'La Cruz', 'Travesias',
+                 'Popular', 'Gerona', 'Asomadera No.2']
+
+neighborhood_options = []
+for neighborhood in neighborhoods:
+    neighborhood_options.append({"label": neighborhood, "value": neighborhood})
+
+select = dbc.Select(
+    id="neighborhood",
+    options=neighborhood_options,
 )
 
-# Contruímos el layout utilizando componentes para una mejor organización del código.
-# app.layout = html.Div(
-#     [logo]
-# )
+form = dbc.Form([select])
+
+row_content = [
+    dbc.Col(html.Div(
+        [
+            dbc.Label("Selecciona un barrio"),
+            form
+        ]
+        ), width=3),
+    dbc.Col(html.Div(id="tab-content", className="p-4"), width=9),
+]
+
+row = html.Div(
+    [
+        dbc.Row(
+            row_content,
+            justify="start",
+        ),
+    ]
+)
 
 app.layout = dbc.Container(
     [
-        dcc.Store(id="store"),
         logo,
-        dbc.Button(
-            "Regenerate graphs",
-            color="primary",
-            id="button",
-            className="mb-3",
-        ),
         dbc.Tabs(
             [
                 dbc.Tab(label="Statistics", tab_id="scatter"),
@@ -145,62 +168,43 @@ app.layout = dbc.Container(
             id="tabs",
             active_tab="scatter",
         ),
-        html.Div(id="tab-content", className="p-4"),
+        html.Div(
+            [
+                dbc.Row(
+                    row_content,
+                    justify="start",
+                ),
+            ]
+        ),
     ]
 )
 
 
-## Definimos los callbacks
+## Definimos los callbacks que permiten la interactividad entre el dashboard, las gráficas y el modelo
 
 @app.callback(
     Output("tab-content", "children"),
-    [Input("tabs", "active_tab"), Input("store", "data")],
+    [Input("tabs", "active_tab"),
+     Input('neighborhood', 'value')],
 )
-def render_tab_content(active_tab, data):
+def render_tab_content(active_tab, neighborhood):
     """
     This callback takes the 'active_tab' property as input, as well as the
     stored graphs, and renders the tab content depending on what the value of
     'active_tab' is.
     """
-    if active_tab and data is not None:
+    if active_tab:
         if active_tab == "scatter":
-            # return dcc.Graph(figure=data["scatter"])
-            h = histogram.Histogram('')
-            h = histogram.Histogram('')
-            return h
+            graphs = histogram.Histogram(neighborhood)
+
+            return graphs
         elif active_tab == "histogram":
             return dbc.Row(
                 [
-                    dbc.Col(dcc.Graph(figure=data["hist_1"]), width=6),
-                    dbc.Col(dcc.Graph(figure=data["hist_2"]), width=6),
+                    dbc.Col('Modelo')
                 ]
             )
     return "No tab selected"
-
-
-@app.callback(Output("store", "data"), [Input("button", "n_clicks")])
-def generate_graphs(n):
-    """
-    This callback generates three simple graphs from random data.
-    """
-    if not n:
-        # generate empty graphs when app loads
-        return {k: go.Figure(data=[]) for k in ["scatter", "hist_1", "hist_2"]}
-
-    # simulate expensive graph generation process
-    time.sleep(2)
-
-    # generate 100 multivariate normal samples
-    data = np.random.multivariate_normal([0, 0], [[1, 0.5], [0.5, 1]], 100)
-
-    scatter = go.Figure(
-        data=[go.Scatter(x=data[:, 0], y=data[:, 1], mode="markers")]
-    )
-    hist_1 = go.Figure(data=[go.Histogram(x=data[:, 0])])
-    hist_2 = go.Figure(data=[go.Histogram(x=data[:, 1])])
-
-    # save figures in a dictionary for sending to the dcc.Store
-    return {"scatter": scatter, "hist_1": hist_1, "hist_2": hist_2}
 
 
 # we use a callback to toggle the collapse on small screens
